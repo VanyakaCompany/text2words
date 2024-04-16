@@ -44,44 +44,79 @@ void readString(int index, char result[], char format[]) {
   }
 }
 
+// Проверить, имеется ли переданный элемент в указанном массиве
+bool isIncluded(char item, char arr[]) {
+  for (int i = 0; i < strlen(arr); i++) {
+    if (item == arr[i]) return true;
+  }
+
+  return false;
+}
+
+// Вывести в консоль подстроку из переданной строке (от start до end, включительно)
+void printSubstr(char str[], int start, int end) {
+  int length = strlen(str);
+
+  if (end >= length) end = length - 1;
+
+  for (int i = start; i <= end; i++) {
+    printf("%c", str[i]);
+  }
+
+  printf("\n");
+}
+
 // Разбить строку по разделителям и вывести в консоль все слова
-int printWords(char string[], char seps[]) {
+int printWords(char str[], char seps[]) {
   int result = 0;
-  char *token;
+  int start = -1;
+  int end = -1;
 
-  token = strtok(string, seps);
+  for (int i = 0; i < strlen(str); i++) {
+    if (!isIncluded(str[i], seps)) {
+      if (start < 0) start = i;
+    }
 
-  while (token != NULL) {
-    result++;
-    printf("%s\n", token);
-    token = strtok(NULL, seps);
+    if (isIncluded(str[i + 1], seps) || str[i + 1] == '\0') {
+      if (start >= 0 && end < 0) end = i;
+    }
+
+    if (start >= 0 && end >= 0) {
+      printSubstr(str, start, end);
+      start = end = -1;
+      result++;
+    }
   }
 
   return result;
 }
 
 int main(void) {
-  int n;
+  int M;
   char text[20][81] = {};
   char seps[] = " ,.";
   int wordsCount = 0;
 
-  readInt(&n, 1, 20); // Считывание кол-ва строк
+  readInt(&M, 1, 20); // Считывание кол-ва строк
 
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < M; i++) {
     readString(i + 1, text[i], "%80[^\n]"); // Считывание строки
   }
 
   printf("\nРезультат:\n");
 
   // Вывод слов из текста
-  for (int i = 0; i < 20; i++) {
-    if (strlen(text[i])) {
-      wordsCount += printWords(text[i], seps);
-    }
+  for (int i = 0; i < M; i++) {
+    wordsCount += printWords(text[i], seps);
   }
 
   if (!wordsCount) printf("no solution!\n");
+
+  printf("\nИсходный текст:\n");
+
+  for (int i = 0; i < M; i++) {
+    printf("\"%s\"\n", text[i]);
+  }
 
   return 0;
 }
